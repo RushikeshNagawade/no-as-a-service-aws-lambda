@@ -1,82 +1,111 @@
-# aws-serverless-springboot3-archetype serverless API
-The aws-serverless-springboot3-archetype project, created with [`aws-serverless-java-container`](https://github.com/aws/serverless-java-container).
+# Serverless Spring Boot 3 API - Demo1
 
-The starter project defines a simple `/ping` resource that can accept `GET` requests with its tests.
+A serverless API application built with Spring Boot 3 and AWS Lambda, created using [`aws-serverless-java-container`](https://github.com/aws/serverless-java-container).
 
-The project folder also includes a `template.yml` file. You can use this [SAM](https://github.com/awslabs/serverless-application-model) file to deploy the project to AWS Lambda and Amazon API Gateway or test in local with the [SAM CLI](https://github.com/awslabs/aws-sam-cli). 
+## Project Overview
 
-## Pre-requisites
-* [AWS CLI](https://aws.amazon.com/cli/)
-* [SAM CLI](https://github.com/awslabs/aws-sam-cli)
-* [Gradle](https://gradle.org/) or [Maven](https://maven.apache.org/)
+This project demonstrates a simple REST API that provides random reasons for saying "no". It includes:
+- Multiple endpoints for fetching reasons and reason counts
+- Spring Boot 3 with Java 17
+- AWS Lambda integration via SAM (Serverless Application Model)
+- Comprehensive unit tests
 
-## Building the project
-You can use the SAM CLI to quickly build the project
+The project includes a `template.yml` file for deployment to AWS Lambda and Amazon API Gateway, and can be tested locally using the [SAM CLI](https://github.com/awslabs/aws-sam-cli). 
+
+## Prerequisites
+
+* [Java 17](https://www.oracle.com/java/technologies/downloads/#java17) or later
+* [Maven 3.6+](https://maven.apache.org/) (build tool)
+* [AWS CLI](https://aws.amazon.com/cli/) (AWS account access)
+* [SAM CLI](https://github.com/awslabs/aws-sam-cli) (local testing and deployment)
+
+## Building the Project
+
+You can build the project using Maven:
+
 ```bash
-$ mvn archetype:generate -DartifactId=aws-serverless-springboot3-archetype -DarchetypeGroupId=com.amazonaws.serverless.archetypes -DarchetypeArtifactId=aws-serverless-jersey-archetype -DarchetypeVersion=2.1.5 -DgroupId=com.aws.noService -Dversion=0.0.1-SNAPSHOT -Dinteractive=false
-$ cd aws-serverless-springboot3-archetype
+$ mvn clean package
+```
+
+Or build and deploy using the SAM CLI:
+
+```bash
 $ sam build
 Building resource 'AwsServerlessSpringboot3ArchetypeFunction'
-Running JavaGradleWorkflow:GradleBuild
-Running JavaGradleWorkflow:CopyArtifacts
+Running Maven:GradleBuild
+Running Maven:CopyArtifacts
 
 Build Succeeded
 
 Built Artifacts  : .aws-sam/build
 Built Template   : .aws-sam/build/template.yaml
-
-Commands you can use next
-=========================
-[*] Invoke Function: sam local invoke
-[*] Deploy: sam deploy --guided
 ```
 
-## Testing locally with the SAM CLI
+## Testing Locally with SAM CLI
 
-From the project root folder - where the `template.yml` file is located - start the API with the SAM CLI.
+From the project root folder - where the `template.yml` file is located - start the API with the SAM CLI:
 
 ```bash
 $ sam local start-api
 
 ...
-Mounting com.amazonaws.serverless.archetypes.StreamLambdaHandler::handleRequest (java11) at http://127.0.0.1:3000/{proxy+} [OPTIONS GET HEAD POST PUT DELETE PATCH]
+Mounting com.aws.noService.StreamLambdaHandler::handleRequest (java17) at http://127.0.0.1:3000/{proxy+} [OPTIONS GET HEAD POST PUT DELETE PATCH]
 ...
 ```
 
-Using a new shell, you can send a test ping request to your API:
+### Available Endpoints
 
+Using a new shell, you can send test requests to your API:
+
+**Root endpoint (ping):**
 ```bash
-$ curl -s http://127.0.0.1:3000/ping | python -m json.tool
+$ curl -s http://127.0.0.1:3000/
 
-{
-    "pong": "Hello, World!"
-}
+Do you meant to say no?
+```
+
+**Get a random reason:**
+```bash
+$ curl -s http://127.0.0.1:3000/no
+
+<random reason from the service>
+```
+
+**Get total count of reasons:**
+```bash
+$ curl -s http://127.0.0.1:3000/no/count
+
+<total number of reasons>
 ``` 
 
 ## Deploying to AWS
-To deploy the application in your AWS account, you can use the SAM CLI's guided deployment process and follow the instructions on the screen
 
-```
+To deploy the application to your AWS account, use the SAM CLI's guided deployment process:
+
+```bash
 $ sam deploy --guided
 ```
 
-Once the deployment is completed, the SAM CLI will print out the stack's outputs, including the new application URL. You can use `curl` or a web browser to make a call to the URL
+Follow the prompts to configure your deployment settings. Once completed, the SAM CLI will output the stack's details, including the API endpoint URL.
 
-```
-...
--------------------------------------------------------------------------------------------------------------
-OutputKey-Description                        OutputValue
--------------------------------------------------------------------------------------------------------------
-AwsServerlessSpringboot3ArchetypeApi - URL for application            https://xxxxxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/pets
--------------------------------------------------------------------------------------------------------------
-```
+### Testing the Deployed API
 
-Copy the `OutputValue` into a browser or use curl to test your first request:
+Once deployment is complete, you can test the endpoints using the provided URL:
 
 ```bash
-$ curl -s https://xxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/ping | python -m json.tool
+$ curl https://<your-api-id>.execute-api.<region>.amazonaws.com/Prod/
 
-{
-    "pong": "Hello, World!"
-}
+Do you meant to say no?
+```
+
+```bash
+$ curl https://<your-api-id>.execute-api.<region>.amazonaws.com/Prod/no
+
+<random reason>
+```
+
+```bash
+$ curl https://<your-api-id>.execute-api.<region>.amazonaws.com/Prod/no/count
+
+<total count>
 ```
