@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Serverless Spring Boot 2 API - com.aws.demo1::aws-serverless-springboot3-archetype
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  AwsServerlessSpringboot3ArchetypeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.aws.demo1.StreamLambdaHandler::handleRequest
+      Runtime: java17
+      CodeUri: target/demo1-0.0.1-SNAPSHOT-lambda-package.zip
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  AwsServerlessSpringboot3ArchetypeApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: AwsServerlessSpringboot3ArchetypeApi
